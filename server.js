@@ -19,6 +19,17 @@ app.get('/', async (req, res) => {
   res.send('Its live');
 })
 
+app.get('/referrals', async (req, res) => {
+  try {
+    const allReferrals = await prisma.referral.findMany();
+    res.status(200).send(allReferrals);
+  } catch (error) {
+    console.error('Error fetching referrals:', error);
+    res.status(500).json({ error: 'Failed to fetch referrals' });
+  }
+});
+
+
 app.post('/referrals', async (req, res) => {
   const { name, email, referral, course} = req.body;
   console.log(req.body);
@@ -35,6 +46,7 @@ app.post('/referrals', async (req, res) => {
     sendReferralEmailMain(name,referral,course)
     res.status(201).json(newReferral);
   } catch (error) {
+    console.log(error);
     if (error.code === 'P2002') {
       res.status(409).json({ error: 'Email already exists' });
     } else {
